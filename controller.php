@@ -4,7 +4,6 @@ include('TicTacToe.php');
 $response = array();
 $slotSelected = (int)$_GET['slot'];
 
-## mongo handshake 
 try {
 	$connection = new Mongo();
 	$db = $connection->tictactoe;

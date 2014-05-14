@@ -5,10 +5,6 @@ class TicTacToe {
 
 	public function initSession() {
 		
-		//$sid = md5(uniqid(rand(), true));
-		//session_id($sid);
-		//session_start();
-		
 		$_SESSION['isWinner'] = 0;
 		$_SESSION['isPlayerWinner'] = 0;
 		$_SESSION['player'] = array();
@@ -29,7 +25,6 @@ class TicTacToe {
 		$_SESSION['player'][$slot] = $slot;
 		$playerSelections = $_SESSION['player'];
 		foreach($winningValues as $key => $values) {
-			##error_log("value = " . print_r($values,true),0);
 			$winningPositions = 0;
 			foreach($playerSelections as $playerSelection) {
 				if(in_array($playerSelection, $values)) { 
@@ -57,10 +52,7 @@ class TicTacToe {
 		$playerSlots = $_SESSION['player'];
 		$aiSlots     = $_SESSION['ai'];
 		$freeSlots   = $_SESSION['free'];
-		$player 	 = 2; 
 		$aiSelection = 0;
-		
-	
 		$playerCount = count($playerSlots);
 		
 		## AI first selection	
@@ -78,17 +70,14 @@ class TicTacToe {
 				unset($_SESSION['free'][$slotSelected]);
 				$aiSelection = $slotSelected;
 			}
-			##error_log("FREE SLOTS AFTER AI MOVE = " . print_r($_SESSION['free'], true),0);
 			return $aiSelection;
 			
 		} else {
 			
 			## Check for a winning move
-			$aiSelection = $this->checkForWin($player);
+			$aiSelection = $this->checkForWin();
 			if($aiSelection > 0) {
 				$_SESSION['isWinner'] = 1;
-				##error_log("FREE SLOTS AFTER AI MOVE = " . print_r($_SESSION['free'], true),0);
-				error_log("AI WINNER");
 				return $aiSelection;
 			}
 			
@@ -97,22 +86,15 @@ class TicTacToe {
 			if($aiSelection > 0) {
 				$_SESSION['ai'][$aiSelection] = $aiSelection;
 				unset($_SESSION['free'][$aiSelection]);
-				##error_log("FREE SLOTS AFTER AI MOVE = " . print_r($_SESSION['free'], true),0);
-				error_log("PERFORMING DEFENSIVE MOVE");
 				return $aiSelection;
 			}
 			
-			## Test for blocking forks
-			## perform this before winning fork
-			## if opponent can fork it sets up a move that forces them to block
+			## play offensive move for potential win if player can't fork
 			$aiSelection = $this->blockPlayerFork();
 			if($aiSelection > 0) {
 				$_SESSION['ai'][$aiSelection] = $aiSelection;
 				unset($_SESSION['free'][$aiSelection]);
-				//error_log("FREE SLOTS AFTER AI MOVE = " . print_r($_SESSION['free'], true),0);
-				error_log("BLOCKED A PLAYER FORK");
-				return $aiSelection;
-				
+				return $aiSelection;				
 			}
 
 			## play a corner
@@ -122,7 +104,6 @@ class TicTacToe {
 					$aiSelection = $freeSlot;
 					$_SESSION['ai'][$aiSelection] = $aiSelection;
 					unset($_SESSION['free'][$aiSelection]);
-					error_log("AI SELECTED A CORNER");
 					return $aiSelection;
 				}
 			}
@@ -134,7 +115,6 @@ class TicTacToe {
 					$aiSelection = $freeSlot;
 					$_SESSION['ai'][$aiSelection] = $aiSelection;
 					unset($_SESSION['free'][$aiSelection]);
-					error_log("AI SELECTED A SIDE");
 					return $aiSelection;
 				}
 			}
@@ -185,7 +165,6 @@ class TicTacToe {
 			
 			$playerForcedMove = 0;
 			$aiSelection = 0;
-			error_log("OPEN POSITION = " . $openPosition);
 			$aiSlots[$openPosition] = $openPosition;
 			unset($freeSlots[$openPosition]);
 			foreach($winningValues as $key => $values) {
@@ -201,16 +180,13 @@ class TicTacToe {
 				$num = count($twoValues);
 				if($num == 2) {
 					$results = array_diff($winningTriple, $twoValues);
-					## should return one result with the key/value of the player forced move
+					## returns one result with the key/value of the player forced move
 					foreach($results as $result) {
 						$playerForcedMove = $result;
 						$playerSlots[$playerForcedMove] = $playerForcedMove;
 						unset($freeSlots[$playerForcedMove]);
-						error_log("openPosition =" . $openPosition);
-						error_log("playerForcedMove =" . $playerForcedMove);
-						error_log("playerSlots =" . print_r($playerSlots, true),0);
-						## check if player can make two in a row
 						
+						## check if player can make two in a row
 						foreach($winningValues as $key => $values) {
 							$potentialForks = 0;
 							$playerArray = array();
@@ -224,7 +200,6 @@ class TicTacToe {
 							if($num == 2) {
 								$openSlot = array_diff($values, $playerArray);
 								foreach($openSlot as $item) {
-									//error_log("FREE SLOT =" . $item);
 									if(in_array($item, $freeSlots)) {					
 										$aiNextMove[$openPosition][$key] = $values;
 									}
@@ -233,7 +208,6 @@ class TicTacToe {
 						}
 						
 						$totalForks = count($aiNextMove[$openPosition]);
-						error_log("OPEN POSITION = " . $openPosition . "POTENTIAL FORKS = " . $totalForks );
 						## if player can make 2 forks don't use the open position
 						if ($totalForks < 2) {
 							return $openPosition;
@@ -242,7 +216,6 @@ class TicTacToe {
 					
 				}
 			}
-			## reset the board a move back;
 			$freeSlots[$openPosition] = $openPosition;
 			unset($aiSlots[$openPosition]);
 			if($playerForcedMove > 0) {
@@ -265,7 +238,6 @@ class TicTacToe {
 		$winningPairs  = array();
 		$aiSelection   = 0;
 		
-		## Loop through player possibilties of having a winning move
 		foreach ($playerSlots as $playerSlot) {
 			foreach ($winningValues as $key => $values) {
 				$foundKey = array_search($playerSlot, $values);
@@ -303,26 +275,18 @@ class TicTacToe {
 		return $aiSelection;
 	}
 	
-	public function checkForWin($player) {
+	public function checkForWin() {
 		
 		$winningValue = 0;
 		$winningPairs  = array();
 		$freeSlots   = $_SESSION['free'];	
 		$winningValues = $_SESSION['winning-combos'];
+		$aiSelections = $_SESSION['ai'];
 		
-		if($player == 1) {
-			$offensiveSlots = $_SESSION['player'];
-			$defensiveSlots = $_SESSION['ai'];
-		} else {
-			$offensiveSlots = $_SESSION['ai'];
-			$defensive      = $_SESSION['player'];
-		}
-		
-		## loop through slots chosen
-		foreach ($offensiveSlots as $offensiveSlot) {
+		foreach ($aiSelections as $aiSelection) {
 			## compare against winning combinations
 			foreach ($winningValues as $key => $values) {
-			$foundKey = array_search($offensiveSlot, $values);
+			$foundKey = array_search($aiSelection, $values);
 				## if selection is in winning pair add it to potential winning pairs
 				if(!empty($foundKey)) {
 					$winningPairs[$key][$foundKey] = $values[$foundKey];
@@ -330,7 +294,6 @@ class TicTacToe {
 			}
 		}
 		
-		##error_log("winning pairs =  " . print_r($winningPairs,true), 0);
 		foreach ($winningPairs as $key => $values) {
 			$num = count($values);
 			
@@ -350,8 +313,6 @@ class TicTacToe {
 					$winningValue = $winTripleValue;
 				}
 				
-				##error_log("free slots =  " . print_r($freeSlots,true), 0);
-				##error_log("winningValue = " . $winningValue);
 				if(in_array($winningValue, $freeSlots)) {
 					return $winningValue;
 				} else {
@@ -360,7 +321,5 @@ class TicTacToe {
 				
 			}			
 		}
-		
 	}
-
 }
