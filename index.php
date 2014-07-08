@@ -38,8 +38,8 @@ try {
             <div class="panel-body">
                 1. Player goes first <br/>
                 2. Click on a box and try to make three in a row!<br/><br/>
-                <b>*NOTE*</b> If player wins please contact:<br/> 
-                <a href="mailto:wschweitzer00@gmail.com">Walter Schweitzer</a> with your winning moves! <br/>
+                <b>*NOTE*</b> This version of Tic-Tac-Toe has been coded so the AI never loses. <br/><br/>If player wins please contact:<br/> 
+                <a href="mailto:wschweitzer00@gmail.com">Walter Schweitzer</a> with your winning combination! <br/>
             </div>
           </div>
 		
