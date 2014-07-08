@@ -1,4 +1,3 @@
-<<<<<<< HEAD
 #
 #
 #  Author: Walter T. Schweitzer
@@ -57,9 +56,3 @@
 #
 #
 #
-=======
-TicTacToe
-=========
-
-Tic Tac Toe. Player goes first AI can't lose
->>>>>>> 42bb9b8794a9cb801519803fb2fb69663445037c
