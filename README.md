@@ -1,5 +1,4 @@
 #
-#
 #  Author: Walter T. Schweitzer
 #  Email:  wschweitzer00@gmail.com
 #
